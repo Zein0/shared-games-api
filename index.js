@@ -77,7 +77,11 @@ app.get('/api/games/xbox', async (req, res) => {
         gameProperties = [...gameProperties, ...gameProperties2]
 	  .sort((a, b) => a.title.localeCompare(b.title))
 	  .reduce((acc, current) => {
-	    if (!acc.some(item => item.title === current.title)) {
+	    const existing = acc.find(item => item.title === current.title);
+	    if (existing) {
+	      // Merge tags, ensuring no duplicates
+	      existing.tags = [...new Set([...existing.tags, ...current.tags])];
+	    } else {
 	      acc.push(current);
 	    }
 	    return acc;
