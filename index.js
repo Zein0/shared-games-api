@@ -74,7 +74,14 @@ app.get('/api/games/xbox', async (req, res) => {
         let gameProperties = await fetchGameProperties(gameIds,'ultimate');
         let gameIdss2 = await fetchGameIDs('XeaPlay');
         let gameProperties2 = await fetchGameProperties(gameIdss2,'XeaPlay');
-        gameProperties = [...gameProperties, ...gameProperties2].sort((a, b) => a.title.localeCompare(b.title));
+        gameProperties = [...gameProperties, ...gameProperties2]
+	  .sort((a, b) => a.title.localeCompare(b.title))
+	  .reduce((acc, current) => {
+	    if (!acc.some(item => item.title === current.title)) {
+	      acc.push(current);
+	    }
+	    return acc;
+	  }, []);
         await client.setEx("xboxGames", 86400, JSON.stringify(gameProperties));
         res.json({ games: gameProperties });
     } catch (error) {
